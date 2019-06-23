@@ -2,15 +2,26 @@ import sys
 import aubio
 import numpy as num
 import pyaudio
+from argparse import ArgumentParser
 
-unit = 'Hz'
-silence = -40
+usage = 'Usage: python {} [-s silence] [-u unit]'
+argparser = ArgumentParser(usage=usage)
+argparser.add_argument('-s', '--silence', type=float, dest='silence', default=-90,  help='silence threshold in dB')
+argparser.add_argument('-u', '--unit'   , type=str,   dest='unit',    default='Hz', help='pitch unit', choices=['Hz', 'midi'])
+args = argparser.parse_args()
 
-# PyAudio object.
-p = pyaudio.PyAudio()
+detector = aubio.pitch(
+    method = 'fcomb',
+    buf_size = 2048,
+    hop_size = 1024,
+    samplerate = 8000
+    )
+detector.set_unit(args.unit)
+detector.set_silence(args.silence)
 
-# Open stream.
-stream = p.open(
+
+audio = pyaudio.PyAudio()
+stream = audio.open(
     format = pyaudio.paFloat32,
     channels = 1,
     rate = 8000,
@@ -18,22 +29,10 @@ stream = p.open(
     frames_per_buffer = 2048
     )
 
-# Aubio's pitch detection.
-pDetection = aubio.pitch(
-    method = "fcomb",
-    buf_size = 2048,
-    hop_size = 1024,
-    samplerate = 8000
-    )
-
-# Set unit.
-pDetection.set_unit(unit)
-pDetection.set_silence(silence)
-
-while True:
+while stream.is_active():
     data = stream.read(1024)
     samples = num.fromstring(data, dtype=aubio.float_type)
-    pitch = pDetection(samples)[0]
+    pitch = detector(samples)[0]
     volume = num.sum(samples**2)/len(samples)
     volume = "{:.6f}".format(volume)
     print(pitch)
