@@ -9,7 +9,7 @@ $ python wpitch -f wcorrel.wav > wcorrel.pitch
 # 2. マイクから音程を検出したらRESTサーバにPOSTする
 
 ```
-$ python wpitch.py | python acorrel.py | python wtrigger.py | python  wpost.py $url
+$ python wpitch.py | python wcorrel.py | python wtrigger.py | python  wpost.py $url
 ```
 
 # aubio
