@@ -1,4 +1,18 @@
-# hitachi_washer
+# hitachi-washer
+
+# 1. 検出したい音を登録
+
+```
+$ python wpitch -f wcorrel.wav > wcorrel.pitch
+```
+
+# 2. マイクから音程を検出したらRESTサーバにPOSTする
+
+```
+$ python wpitch.py | python acorrel.py | python wtrigger.py | python  wpost.py $url
+```
+
+# aubio
 
 ## Pitch detection from WAV file using aubio
 
@@ -25,12 +39,5 @@ $ aubio pitch -r 8000 -B 2048 -H 1024 -m fcomb -s -90 wcorrel.wav | awk '{print 
 ```
 $ aubio pitch -r 8000 -B 2048 -H 1024 -m fcomb -s -90 target.wav | awk '{print $2}' | python acorrel.py | python wtrigger.py
 ```
-
-## マイクから音程を検出したらRESTサーバにPOSTする
-
-```
-$ python wpitch.py | python acorrel.py | python wtrigger.py | python  wpost $url
-```
-
 
 
